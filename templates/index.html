@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireguard Gateway</title>
+    <!-- Fonte Moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 16L16 12L12 8" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 12H16" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="paint0_linear" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#4F46E5"/>
+                            <stop offset="1" stop-color="#EC4899"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1>Wireguard <span>Gateway</span></h1>
+            </div>
+            <p>Gerador de configurações seguro e moderno.</p>
+        </header>
+
+        <main>
+            <form id="wg-form">
+                <!-- Interface Section -->
+                <section class="glass-panel">
+                    <h2>
+                        <span class="icon">💻</span>
+                        Interface Local
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="private_key">Chave Privada <span class="badge">Obrigatório</span></label>
+                        <div class="input-with-action">
+                            <input type="text" id="private_key" name="private_key" placeholder="Ex: aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890=" required>
+                            <button type="button" id="btn-generate-keys" class="btn-secondary">Gerar Chaves</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="public_key_group" style="display: none;">
+                        <label for="public_key">Chave Pública Gerada <span class="badge" style="background-color: var(--secondary); color: white;">Copie e coloque no Peer remoto</span></label>
+                        <div class="input-with-action">
+                            <input type="text" id="public_key" name="public_key" readonly>
+                            <button type="button" id="btn-copy-public-key" class="btn-secondary">Copiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Endereço IPv4 / IPv6 <span class="badge">Obrigatório</span></label>
+                        <input type="text" id="address" name="address" placeholder="Ex: 10.0.0.2/24" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="listen_port">Porta de Escuta</label>
+                            <input type="number" id="listen_port" name="listen_port" placeholder="Ex: 51820" value="51820">
+                        </div>
+                        <div class="form-group half">
+                            <label for="dns">Servidor DNS</label>
+                            <input type="text" id="dns" name="dns" placeholder="Ex: 1.1.1.1, 8.8.8.8">
+                            <small style="display: block; margin-top: 0.5rem; color: #a1a1aa;">Nota para Debian 13: o uso de DNS requer <code>sudo apt install openresolv</code></small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Peer Section -->
+                <section class="glass-panel">
+                    <h2>
+                        <span class="icon">🌍</span>
+                        Servidor / Peer
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="peer_public_key">Chave Pública do Peer <span class="badge">Obrigatório</span></label>
+                        <input type="text" id="peer_public_key" name="peer_public_key" placeholder="Ex: aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890=" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="peer_endpoint">Endpoint (IP:Porta)</label>
+                            <input type="text" id="peer_endpoint" name="peer_endpoint" placeholder="Ex: vpn.exemplo.com:51820">
+                        </div>
+                        <div class="form-group half">
+                            <label for="peer_allowed_ips">IPs Permitidos <span class="badge">Obrigatório</span></label>
+                            <input type="text" id="peer_allowed_ips" name="peer_allowed_ips" placeholder="Ex: 0.0.0.0/0, ::/0" required>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="actions" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button type="submit" class="btn-primary" id="btn-submit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Gerar e Salvar .conf
+                    </button>
+                    <button type="button" class="btn-secondary" id="btn-activate" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"></path></svg>
+                        Ativar WireGuard
+                    </button>
+                </div>
+            </form>
+        </main>
+
+        <!-- Modal de Sucesso -->
+        <div id="success-modal" class="modal hidden">
+            <div class="modal-content glass-panel">
+                <div class="success-icon">✓</div>
+                <h3>Configuração Gerada!</h3>
+                <p id="success-modal-message">O arquivo <strong>wg0.conf</strong> foi salvo com sucesso.</p>
+                <div class="generated-keys-info" id="generated-pubkey-display" style="display: none;">
+                    <p class="small-text">Sua Chave Pública (forneça ao administrador do servidor):</p>
+                    <div class="copy-box">
+                        <code id="display_pubkey"></code>
+                        <button type="button" id="btn-copy-pubkey" class="btn-icon">📋</button>
+                    </div>
+                </div>
+                <button class="btn-primary mt-4" id="btn-close-modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
